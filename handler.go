@@ -20,6 +20,7 @@ func main() {
 	http.HandleFunc("/register", Register)
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/token", Token)
+	log.Printf("simple-auth running at %v\n", httpAddr)
 	if err := http.ListenAndServe(httpAddr, nil); err != nil {
 		log.Fatalln(err)
 	}
