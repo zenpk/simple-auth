@@ -1,0 +1,51 @@
+### register: duplicate
+POST http://127.0.0.1:8080/register
+Content-Type: application/json
+
+{
+  "username": "zenpk",
+  "password": "zenpk"
+}
+
+### register success
+POST http://127.0.0.1:8080/register
+Content-Type: application/json
+
+{
+  "username": "zenpk2",
+  "password": "zenpk2"
+}
+
+### login wrong password
+POST http://127.0.0.1:8080/login
+Content-Type: application/json
+
+{
+  "username": "zenpk",
+  "password": "wrong"
+}
+
+### login success
+POST http://127.0.0.1:8080/login
+Content-Type: application/json
+
+{
+  "username": "zenpk",
+  "password": "zenpk"
+}
+
+### token wrong
+POST http://127.0.0.1:8080/token
+Content-Type: application/json
+
+{
+  "token": "abc"
+}
+
+### token success
+POST http://127.0.0.1:8080/token
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTg5OTIyNjksIm5iZiI6MTY4NzQ1NjI2OSwiaWF0IjoxNjg3NDU2MjY5LCJpZCI6Mn0.9VbUfmdrO_yAVNF2ut-kdHL48jcpAC4TrjZ7m-xciYg"
+}
