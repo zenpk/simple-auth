@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
@@ -37,6 +38,7 @@ type tokenReqResp struct {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
+	printLog("/register", r)
 	var u user
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -83,6 +85,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	printLog("/login", r)
 	var u user
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -128,6 +131,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func Token(w http.ResponseWriter, r *http.Request) {
+	printLog("/token", r)
 	var t tokenReqResp
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
@@ -155,4 +159,16 @@ func response(w http.ResponseWriter, data any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	_ = json.NewEncoder(w).Encode(data)
+	fmt.Println(data)
+}
+
+func printLog(route string, r *http.Request) {
+	ipAddress := r.Header.Get("X-Real-Ip")
+	if ipAddress == "" {
+		ipAddress = r.Header.Get("X-Forwarded-For")
+	}
+	if ipAddress == "" {
+		ipAddress = r.RemoteAddr
+	}
+	log.Printf("%v %v\n", route, ipAddress)
 }
