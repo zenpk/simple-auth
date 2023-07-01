@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
@@ -164,8 +163,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func TokenCheck(w http.ResponseWriter, r *http.Request) {
 	printLog("/token-check", r)
-	var t tokenReqResp
-	err := json.NewDecoder(r.Body).Decode(&t)
+	var req tokenReqResp
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response(w, resp{
 			Ok:  false,
@@ -173,7 +172,7 @@ func TokenCheck(w http.ResponseWriter, r *http.Request) {
 		}, http.StatusBadRequest)
 		return
 	}
-	_, err = parseBasicToken(t.Token)
+	_, err = parseBasicToken(req.Token)
 	if err != nil {
 		response(w, resp{
 			Ok:  false,
@@ -189,8 +188,8 @@ func TokenCheck(w http.ResponseWriter, r *http.Request) {
 
 func TokenGen(w http.ResponseWriter, r *http.Request) {
 	printLog("/token-gen", r)
-	var t tokenGenReq
-	err := json.NewDecoder(r.Body).Decode(&t)
+	var req tokenGenReq
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response(w, tokenReqResp{
 			resp{
@@ -201,7 +200,7 @@ func TokenGen(w http.ResponseWriter, r *http.Request) {
 		}, http.StatusBadRequest)
 		return
 	}
-	_, err = parseBasicToken(t.Token)
+	_, err = parseBasicToken(req.Token)
 	if err != nil {
 		response(w, tokenReqResp{
 			resp{
@@ -212,7 +211,7 @@ func TokenGen(w http.ResponseWriter, r *http.Request) {
 		}, http.StatusOK)
 		return
 	}
-	token, err := genDataToken(t.Data, time.Duration(t.Age))
+	token, err := genDataToken(req.Data, time.Duration(req.Age))
 	if err != nil {
 		response(w, tokenReqResp{
 			resp{
@@ -234,8 +233,8 @@ func TokenGen(w http.ResponseWriter, r *http.Request) {
 
 func TokenParse(w http.ResponseWriter, r *http.Request) {
 	printLog("/token-parse", r)
-	var t tokenReqResp
-	err := json.NewDecoder(r.Body).Decode(&t)
+	var req tokenReqResp
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response(w, tokenParseResp{
 			resp{
@@ -246,7 +245,7 @@ func TokenParse(w http.ResponseWriter, r *http.Request) {
 		}, http.StatusBadRequest)
 		return
 	}
-	claims, err := parseDataToken(t.Token)
+	claims, err := parseDataToken(req.Token)
 	if err != nil {
 		response(w, tokenParseResp{
 			resp{
@@ -270,7 +269,7 @@ func response(w http.ResponseWriter, data any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	_ = json.NewEncoder(w).Encode(data)
-	fmt.Println(data)
+	log.Println(data)
 }
 
 func printLog(route string, r *http.Request) {

@@ -24,8 +24,8 @@ go build .
 
 ```typescript
 {
-  username: string;
-  password: string;
+    username: string;
+    password: string;
 }
 ```
 
@@ -33,19 +33,23 @@ go build .
 
 ```typescript
 {
-  ok: boolean;
-  msg: string;
-  token: string;
+    ok: boolean;
+    msg: string;
+    token: string;
 }
 ```
 
-### Token
+The token returned from register/login API is a short-life token, it is used for further token generation.
+
+### Token-check
+
+Token-check API only check if a token is valid, it does not return any data in the token.
 
 #### Request
 
 ```typescript
 {
-  token: string;
+    token: string;
 }
 ```
 
@@ -53,7 +57,53 @@ go build .
 
 ```typescript
 {
-  ok: boolean;
-  msg: string;
+    ok: boolean;
+    msg: string;
+}
+```
+
+### Token-gen
+
+Token-gen API takes a valid token and generate a new token, with specified age and data.
+
+#### Request
+
+```typescript
+{
+    token: string;
+    age: number;
+    data: string;
+}
+```
+
+### Response
+
+```typescript
+{
+    ok: boolean;
+    msg: string;
+    token: string;
+}
+```
+
+### Token-parse
+
+Token-parse API verify the token and return the information contained in the token.
+
+#### Request
+
+```typescript
+{
+    token: string;
+}
+```
+
+### Response
+
+```typescript
+{
+    ok: boolean;
+    msg: string;
+    data: string;
 }
 ```

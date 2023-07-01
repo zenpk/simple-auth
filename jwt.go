@@ -58,6 +58,9 @@ func parseBasicToken(tokenString string) (*jwt.RegisteredClaims, error) {
 		}
 		return []byte(jwtSecret), nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
 		return claims, nil
 	} else {
@@ -73,6 +76,9 @@ func parseDataToken(tokenString string) (*MyCustomClaims, error) {
 		}
 		return []byte(jwtSecret), nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
 		return claims, nil
 	} else {

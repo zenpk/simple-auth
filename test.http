@@ -34,18 +34,52 @@ Content-Type: application/json
   "password": "zenpk"
 }
 
-### token wrong
-POST http://127.0.0.1:8080/token
+### token check wrong
+POST http://127.0.0.1:8080/token-check
 Content-Type: application/json
 
 {
   "token": "abc"
 }
 
-### token success
-POST http://127.0.0.1:8080/token
+### token check correct
+POST http://127.0.0.1:8080/token-check
 Content-Type: application/json
 
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTg5OTIyNjksIm5iZiI6MTY4NzQ1NjI2OSwiaWF0IjoxNjg3NDU2MjY5LCJpZCI6Mn0.9VbUfmdrO_yAVNF2ut-kdHL48jcpAC4TrjZ7m-xciYg"
+}
+
+### token gen failure
+POST http://127.0.0.1:8080/token-gen
+Content-Type: application/json
+
+{
+  "token": "abc"
+}
+
+### token gen success
+POST http://127.0.0.1:8080/token-gen
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTg5OTIyNjksIm5iZiI6MTY4NzQ1NjI2OSwiaWF0IjoxNjg3NDU2MjY5LCJpZCI6Mn0.9VbUfmdrO_yAVNF2ut-kdHL48jcpAC4TrjZ7m-xciYg",
+  "age": 10000,
+  "data": "'name':'zenpk'"
+}
+
+### token parse failure
+POST http://127.0.0.1:8080/token-parse
+Content-Type: application/json
+
+{
+  "token": "abc"
+}
+
+### token parse success
+POST http://127.0.0.1:8080/token-parse
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQyMzMxNDIsIm5iZiI6MTY4ODIzMzE0MiwiaWF0IjoxNjg4MjMzMTQyLCJkYXRhIjoiJ25hbWUnOid6ZW5waycifQ.MdNHh3VrPHUVF0C9-NCbyVXLjJUncgOBj5jck5973-M"
 }
