@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"time"
 )
 
 const (
@@ -20,7 +21,9 @@ func main() {
 	}
 	http.HandleFunc("/register", Register)
 	http.HandleFunc("/login", Login)
-	http.HandleFunc("/token", Token)
+	http.HandleFunc("/token-gen", TokenGen)
+	http.HandleFunc("/token-check", TokenCheck)
+	http.HandleFunc("/token-parse", TokenParse)
 	log.Printf("simple-auth running at %v\n", httpAddr)
 	if err := http.ListenAndServe(httpAddr, nil); err != nil {
 		log.Fatalln(err)
@@ -37,50 +40,70 @@ type tokenReqResp struct {
 	Token string `json:"token"`
 }
 
+type tokenGenReq struct {
+	Token string `json:"token"`
+	Age   int64  `json:"age"`
+	Data  string `json:"data"`
+}
+
+type tokenParseResp struct {
+	resp
+	Data string `json:"data"`
+}
+
 func Register(w http.ResponseWriter, r *http.Request) {
 	printLog("/register", r)
 	var u user
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		response(w, resp{
-			Ok:  false,
-			Msg: err.Error(),
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
 		}, http.StatusBadRequest)
 		return
 	}
 	maxId, _, err := findByUsername(u.Username)
 	if err != ErrUserNotFound {
-		response(w, resp{
-			Ok:  false,
-			Msg: "user already exists",
-		}, http.StatusBadRequest)
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: "user already exists",
+			},
+			"",
+		}, http.StatusOK)
 		return
 	}
 	u.Id = maxId + 1
 	if err := addUser(u); err != nil {
-		response(w, resp{
-			Ok:  false,
-			Msg: err.Error(),
-		}, http.StatusBadRequest)
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
+		}, http.StatusOK)
 		return
 	}
-	claims := &MyCustomClaims{
-		Id: u.Id,
-	}
-	token, err := genToken(claims)
+	token, err := genBasicToken()
 	if err != nil {
-		response(w, resp{
-			Ok:  false,
-			Msg: err.Error(),
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
 		}, http.StatusBadRequest)
 		return
 	}
 	response(w, tokenReqResp{
-		Token: token,
 		resp: resp{
 			Ok:  true,
 			Msg: "ok",
 		},
+		Token: token,
 	}, http.StatusOK)
 }
 
@@ -89,49 +112,58 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var u user
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		response(w, resp{
-			Ok:  false,
-			Msg: err.Error(),
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
 		}, http.StatusBadRequest)
 		return
 	}
 	_, foundUser, err := findByUsername(u.Username)
 	if err != nil {
-		response(w, resp{
-			Ok:  false,
-			Msg: err.Error(),
-		}, http.StatusBadRequest)
-		return
-	}
-	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(u.Password)); errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-		response(w, resp{
-			Ok:  false,
-			Msg: "wrong password",
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
 		}, http.StatusOK)
 		return
 	}
-	claims := &MyCustomClaims{
-		Id: foundUser.Id,
+	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(u.Password)); errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: "wrong password",
+			},
+			"",
+		}, http.StatusOK)
+		return
 	}
-	token, err := genToken(claims)
+	token, err := genBasicToken()
 	if err != nil {
-		response(w, resp{
-			Ok:  false,
-			Msg: err.Error(),
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
 		}, http.StatusBadRequest)
 		return
 	}
 	response(w, tokenReqResp{
-		Token: token,
 		resp: resp{
 			Ok:  true,
 			Msg: "ok",
 		},
+		Token: token,
 	}, http.StatusOK)
 }
 
-func Token(w http.ResponseWriter, r *http.Request) {
-	printLog("/token", r)
+func TokenCheck(w http.ResponseWriter, r *http.Request) {
+	printLog("/token-check", r)
 	var t tokenReqResp
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
@@ -141,7 +173,7 @@ func Token(w http.ResponseWriter, r *http.Request) {
 		}, http.StatusBadRequest)
 		return
 	}
-	_, err = parseToken(t.Token)
+	_, err = parseBasicToken(t.Token)
 	if err != nil {
 		response(w, resp{
 			Ok:  false,
@@ -152,6 +184,85 @@ func Token(w http.ResponseWriter, r *http.Request) {
 	response(w, resp{
 		Ok:  true,
 		Msg: "ok",
+	}, http.StatusOK)
+}
+
+func TokenGen(w http.ResponseWriter, r *http.Request) {
+	printLog("/token-gen", r)
+	var t tokenGenReq
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
+		}, http.StatusBadRequest)
+		return
+	}
+	_, err = parseBasicToken(t.Token)
+	if err != nil {
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
+		}, http.StatusOK)
+		return
+	}
+	token, err := genDataToken(t.Data, time.Duration(t.Age))
+	if err != nil {
+		response(w, tokenReqResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
+		}, http.StatusBadRequest)
+		return
+	}
+	response(w, tokenReqResp{
+		resp: resp{
+			Ok:  true,
+			Msg: "ok",
+		},
+		Token: token,
+	}, http.StatusOK)
+}
+
+func TokenParse(w http.ResponseWriter, r *http.Request) {
+	printLog("/token-parse", r)
+	var t tokenReqResp
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		response(w, tokenParseResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
+		}, http.StatusBadRequest)
+		return
+	}
+	claims, err := parseDataToken(t.Token)
+	if err != nil {
+		response(w, tokenParseResp{
+			resp{
+				Ok:  false,
+				Msg: err.Error(),
+			},
+			"",
+		}, http.StatusOK)
+		return
+	}
+	response(w, tokenParseResp{
+		resp{
+			Ok:  true,
+			Msg: "ok",
+		},
+		claims.Data,
 	}, http.StatusOK)
 }
 
