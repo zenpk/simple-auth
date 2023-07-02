@@ -6,7 +6,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
-	"time"
 )
 
 const (
@@ -211,7 +210,7 @@ func TokenGen(w http.ResponseWriter, r *http.Request) {
 		}, http.StatusOK)
 		return
 	}
-	token, err := genDataToken(req.Data, time.Duration(req.Age))
+	token, err := genDataToken(req.Data, req.Age)
 	if err != nil {
 		response(w, tokenReqResp{
 			resp{

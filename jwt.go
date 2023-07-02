@@ -18,16 +18,17 @@ type MyCustomClaims struct {
 
 // GenBasicToken generate JWT token without data
 func genBasicToken() (string, error) {
+	age := time.Duration(tokenAge) * time.Hour
 	claims := jwt.RegisteredClaims{
 		// fixed dates can also be used for the NumericDate
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenAge)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(age)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		NotBefore: jwt.NewNumericDate(time.Now()),
 	}
 	return genToken(claims)
 }
 
-func genDataToken(data string, tokenAge time.Duration) (string, error) {
+func genDataToken(data string, tokenAge int64) (string, error) {
 	age := time.Duration(tokenAge) * time.Hour
 	customClaims := MyCustomClaims{
 		jwt.RegisteredClaims{
