@@ -13,7 +13,8 @@ const (
 
 type MyCustomClaims struct {
 	jwt.RegisteredClaims
-	Data string `json:"data"`
+	AppId string `json:"appId"`
+	Data  string `json:"data"`
 }
 
 // GenBasicToken generate JWT token without data
@@ -28,7 +29,7 @@ func genBasicToken() (string, error) {
 	return genToken(claims)
 }
 
-func genDataToken(data string, tokenAge int64) (string, error) {
+func genDataToken(appId string, data string, tokenAge int64) (string, error) {
 	age := time.Duration(tokenAge) * time.Hour
 	customClaims := MyCustomClaims{
 		jwt.RegisteredClaims{
@@ -37,6 +38,7 @@ func genDataToken(data string, tokenAge int64) (string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
+		appId,
 		data,
 	}
 	return genToken(customClaims)

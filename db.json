@@ -1,4 +1,9 @@
 {
   "users": [
+    {
+      "id": 1,
+      "username": "zenpk",
+      "password": "$2a$12$g314thqlEnsrKWKAVrAw0ej5wiv05lbEF1KUKctdbPEoierDFch6W"
+    }
   ]
 }

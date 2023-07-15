@@ -41,27 +41,6 @@ go build .
 
 The token returned from register/login API is a short-life token, it is used for further token generation.
 
-### Token-check
-
-Token-check API only check if a token is valid, it does not return any data in the token.
-
-#### Request
-
-```typescript
-{
-    token: string;
-}
-```
-
-#### Response
-
-```typescript
-{
-    ok: boolean;
-    msg: string;
-}
-```
-
 ### Token-gen
 
 Token-gen API takes a valid token and generate a new token, with specified age and data.
@@ -70,6 +49,7 @@ Token-gen API takes a valid token and generate a new token, with specified age a
 
 ```typescript
 {
+    appId: string;
     token: string;
     age: number;
     data: string;
@@ -86,6 +66,28 @@ Token-gen API takes a valid token and generate a new token, with specified age a
 }
 ```
 
+### Token-check
+
+Token-check API only check if a token is valid, it does not return any data in the token.
+
+#### Request
+
+```typescript
+{
+    appId: string;
+    token: string;
+}
+```
+
+#### Response
+
+```typescript
+{
+    ok: boolean;
+    msg: string;
+}
+```
+
 ### Token-parse
 
 Token-parse API verify the token and return the information contained in the token.
@@ -94,6 +96,7 @@ Token-parse API verify the token and return the information contained in the tok
 
 ```typescript
 {
+    appId: string;
     token: string;
 }
 ```

@@ -1,19 +1,10 @@
-### register: duplicate
+### register success/duplicate
 POST http://127.0.0.1:8080/register
 Content-Type: application/json
 
 {
   "username": "zenpk",
   "password": "zenpk"
-}
-
-### register success
-POST http://127.0.0.1:8080/register
-Content-Type: application/json
-
-{
-  "username": "zenpk2",
-  "password": "zenpk2"
 }
 
 ### login wrong password
@@ -34,27 +25,12 @@ Content-Type: application/json
   "password": "zenpk"
 }
 
-### token check wrong
-POST http://127.0.0.1:8080/token-check
-Content-Type: application/json
-
-{
-  "token": "abc"
-}
-
-### token check correct
-POST http://127.0.0.1:8080/token-check
-Content-Type: application/json
-
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTg5OTIyNjksIm5iZiI6MTY4NzQ1NjI2OSwiaWF0IjoxNjg3NDU2MjY5LCJpZCI6Mn0.9VbUfmdrO_yAVNF2ut-kdHL48jcpAC4TrjZ7m-xciYg"
-}
-
 ### token gen failure
 POST http://127.0.0.1:8080/token-gen
 Content-Type: application/json
 
 {
+  "appId": "abc",
   "token": "abc"
 }
 
@@ -63,9 +39,37 @@ POST http://127.0.0.1:8080/token-gen
 Content-Type: application/json
 
 {
+  "appId": "abc",
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTg5OTIyNjksIm5iZiI6MTY4NzQ1NjI2OSwiaWF0IjoxNjg3NDU2MjY5LCJpZCI6Mn0.9VbUfmdrO_yAVNF2ut-kdHL48jcpAC4TrjZ7m-xciYg",
   "age": 10000,
   "data": "'name':'zenpk'"
+}
+
+### token check wrong
+POST http://127.0.0.1:8080/token-check
+Content-Type: application/json
+
+{
+  "appId": "abc",
+  "token": "abc"
+}
+
+### token check wrong appId
+POST http://127.0.0.1:8080/token-check
+Content-Type: application/json
+
+{
+  "appId": "abcd",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NDQ3OTIsIm5iZiI6MTY4OTQ0NDc5MiwiaWF0IjoxNjg5NDQ0NzkyLCJhcHBJZCI6ImFiYyIsImRhdGEiOiInbmFtZSc6J3plbnBrJyJ9.86R4pFgNvcABdrNx6_x_qYpi2aM-Zq43nh_JcfdAXg4"
+}
+
+### token check correct
+POST http://127.0.0.1:8080/token-check
+Content-Type: application/json
+
+{
+  "appId": "abc",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NDQ3OTIsIm5iZiI6MTY4OTQ0NDc5MiwiaWF0IjoxNjg5NDQ0NzkyLCJhcHBJZCI6ImFiYyIsImRhdGEiOiInbmFtZSc6J3plbnBrJyJ9.86R4pFgNvcABdrNx6_x_qYpi2aM-Zq43nh_JcfdAXg4"
 }
 
 ### token parse failure
@@ -73,13 +77,24 @@ POST http://127.0.0.1:8080/token-parse
 Content-Type: application/json
 
 {
+  "appId": "abc",
   "token": "abc"
 }
 
-### token parse success
+### token parse wrong appId
 POST http://127.0.0.1:8080/token-parse
 Content-Type: application/json
 
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQyMzMxNDIsIm5iZiI6MTY4ODIzMzE0MiwiaWF0IjoxNjg4MjMzMTQyLCJkYXRhIjoiJ25hbWUnOid6ZW5waycifQ.MdNHh3VrPHUVF0C9-NCbyVXLjJUncgOBj5jck5973-M"
+  "appId": "abcd",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NDQ3OTIsIm5iZiI6MTY4OTQ0NDc5MiwiaWF0IjoxNjg5NDQ0NzkyLCJhcHBJZCI6ImFiYyIsImRhdGEiOiInbmFtZSc6J3plbnBrJyJ9.86R4pFgNvcABdrNx6_x_qYpi2aM-Zq43nh_JcfdAXg4"
+}
+
+### token parse sucess
+POST http://127.0.0.1:8080/token-parse
+Content-Type: application/json
+
+{
+  "appId": "abc",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NDQ3OTIsIm5iZiI6MTY4OTQ0NDc5MiwiaWF0IjoxNjg5NDQ0NzkyLCJhcHBJZCI6ImFiYyIsImRhdGEiOiInbmFtZSc6J3plbnBrJyJ9.86R4pFgNvcABdrNx6_x_qYpi2aM-Zq43nh_JcfdAXg4"
 }
